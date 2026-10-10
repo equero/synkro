@@ -2,8 +2,6 @@
 
 Keep `develop` and `main` in sync and bump the version with semver, in any git repo.
 
-> **Status:** in development. Not published yet.
-
 ## Install
 
 ```sh
