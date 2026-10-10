@@ -8,8 +8,7 @@
     "noUncheckedIndexedAccess": true,
     "verbatimModuleSyntax": true,
     "erasableSyntaxOnly": true,
-    "allowImportingTsExtensions": true,
-    "rewriteRelativeImportExtensions": true,
+    "customConditions": ["development"],
     "rootDir": "src",
     "outDir": "dist",
     "skipLibCheck": true
