@@ -2,7 +2,8 @@
 
 import { readFileSync } from "node:fs";
 import { init } from "./commands/init.ts";
-import { ConfigError } from "./config.ts";
+import { sync } from "./commands/sync.ts";
+import { BUMPS, type Bump, ConfigError } from "./config.ts";
 import { type Options, UsageError } from "./context.ts";
 import { GitError } from "./git.ts";
 import { VersionError } from "./version.ts";
@@ -56,6 +57,15 @@ function run(command: string, flags: string[]) {
   switch (command) {
     case "init":
       return init(options);
+    case "sync": {
+      const bumps = BUMPS.filter((bump) => flags.includes(`--${bump}`));
+      if (bumps.length > 1) throw new UsageError(`Pick only one of --patch, --minor, --major`);
+      return sync({
+        ...options,
+        bump: (bumps[0] as Bump) ?? null,
+        tag: !flags.includes("--no-tag"),
+      });
+    }
     default:
       throw new UsageError(`synkro ${command}: not implemented yet`);
   }

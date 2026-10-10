@@ -75,7 +75,15 @@ export function createGit({ cwd, dryRun = false, log = console.log }: GitOptions
     /** Current branch name, or null on a detached HEAD. */
     currentBranch: () => tryRead("symbolic-ref", "--short", "--quiet", "HEAD"),
 
-    isClean: () => read("status", "--porcelain") === "",
+    /** No uncommitted changes to tracked files (untracked files don't block a merge). */
+    isClean: () => read("status", "--porcelain", "--untracked-files=no") === "",
+
+    /** Commits in `ref` that `base` doesn't have. */
+    countAhead: (base: string, ref: string) =>
+      Number(read("rev-list", "--count", `${base}..${ref}`)),
+
+    isAncestor: (ancestor: string, ref: string) =>
+      tryRead("merge-base", "--is-ancestor", ancestor, ref) !== null,
 
     hasRemote: (remote: string) => tryRead("remote", "get-url", remote) !== null,
 
