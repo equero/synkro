@@ -1,5 +1,5 @@
 {
-  "name": "synkro",
+  "name": "@equerodev/synkro",
   "version": "0.2.0",
   "description": "Keep develop and main in sync and bump the version with semver, from any git repo.",
   "keywords": [
@@ -34,6 +34,9 @@
   "files": [
     "dist/"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=22"
   },

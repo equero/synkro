@@ -5,8 +5,10 @@ Keep `develop` and `main` in sync and bump the version with semver, in any git r
 ## Install
 
 ```sh
-npm i -g synkro
+npm i -g @equerodev/synkro
 ```
+
+The command is `synkro`.
 
 ## Usage
 
