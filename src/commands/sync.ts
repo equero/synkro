@@ -1,37 +1,14 @@
-import { basename } from "node:path";
-import { type Bump, resolveMainBranch } from "../config.ts";
-import { type Context, type Options, openRepo, UsageError } from "../context.ts";
-import { GitError } from "../git.ts";
-import {
-  bumpVersion,
-  changelog,
-  readVersion,
-  tagExists,
-  tagName,
-  writeVersion,
-} from "../version.ts";
+import { type Bump, resolveMainBranch } from "#config";
+import { type Context, type Options, openRepo, UsageError } from "#context";
+import { GitError } from "#git";
+import { planRelease } from "#release";
+import { tagExists, tagName, writeVersion } from "#version";
 
 export interface SyncOptions extends Options {
   /** null = use the configured default. */
   bump: Bump | null;
   tag: boolean;
 }
-
-/** Converts a simple glob (*, **, ?) to a RegExp. Patterns without "/" match the file name. */
-function globToRegExp(glob: string): RegExp {
-  const source = glob
-    .replace(/[.+^${}()|[\]\\]/g, "\\$&")
-    .replace(/\*\*\//g, "\u0001")
-    .replace(/\*\*/g, "\u0000")
-    .replace(/\*/g, "[^/]*")
-    .replace(/\?/g, "[^/]")
-    .replaceAll("\u0001", "(?:.*/)?")
-    .replaceAll("\u0000", ".*");
-  return new RegExp(`^${source}$`);
-}
-
-const matchesAny = (file: string, globs: string[]) =>
-  globs.some((glob) => globToRegExp(glob).test(glob.includes("/") ? file : basename(file)));
 
 /** Fails unless the repo is in a state where a release can't go wrong halfway. */
 function checkState(ctx: Context, main: string, online: boolean) {
@@ -100,26 +77,22 @@ export function sync(options: SyncOptions): void {
   const online = ctx.push && git.hasRemote(remote);
   checkState(ctx, main, online);
 
-  const pending = git.countAhead(main, develop);
+  const bump = options.bump ?? config.bump;
+  const plan = planRelease(ctx, main, bump);
+  const { pending, commits, kind, current } = plan;
   if (pending === 0) {
     log(`Nothing to release: ${develop} has no commits that ${main} doesn't have.`);
     return;
   }
 
-  const changed = git.read("diff", "--name-only", `${main}...${develop}`).split("\n");
-  const onlySkipped = changed.every((file) => matchesAny(file, config.skipIfOnly));
-  const bump = options.bump ?? config.bump;
-  const { kind, current } = readVersion(root, git);
-
-  let next: string | null = null;
+  const next = options.tag ? plan.next : null;
   if (!options.tag) {
     log(`Merging ${pending} commit(s) without a new version (--no-tag).`);
-  } else if (onlySkipped) {
+  } else if (!next) {
     log(
       `Merging ${pending} commit(s) without a new version (only ${config.skipIfOnly.join(", ")} changed).`,
     );
   } else {
-    next = bumpVersion(current ?? "0.0.0", bump);
     if (tagExists(git, tagName(next))) {
       throw new UsageError(
         `Tag ${tagName(next)} already exists. Is the version in ${kind} behind?`,
@@ -128,7 +101,6 @@ export function sync(options: SyncOptions): void {
     log(`Releasing ${current ?? "(none)"} → ${next} (${bump}, from ${kind})`);
   }
 
-  const commits = changelog(git, main, develop);
   log(commits.map((line) => `  ${line}`).join("\n"));
   log("");
 

@@ -1,25 +1,22 @@
 #!/usr/bin/env node
 
-import { readFileSync } from "node:fs";
-import { init } from "./commands/init.ts";
-import { sync } from "./commands/sync.ts";
-import { BUMPS, type Bump, ConfigError } from "./config.ts";
-import { type Options, UsageError } from "./context.ts";
-import { GitError } from "./git.ts";
-import { VersionError } from "./version.ts";
+import { createRequire } from "node:module";
+import { init } from "#commands/init";
+import { status } from "#commands/status";
+import { sync } from "#commands/sync";
+import { BUMPS, type Bump, ConfigError } from "#config";
+import { type Options, UsageError } from "#context";
+import { GitError } from "#git";
+import { VersionError } from "#version";
 
-const { version } = JSON.parse(
-  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
-) as {
-  version: string;
-};
+const { version } = createRequire(import.meta.url)("#package.json") as { version: string };
 
 const HELP = `synkro ${version} — keep develop and main in sync and bump the version
 
 Usage:
   synkro init [options]       Set up main/develop in the current repo
   synkro sync [options]       Merge develop into main, bump, tag and push
-  synkro status               Show branches, versions and last tag
+  synkro status               Show branches, version, next release and problems
 
 Options:
   --patch | --minor | --major Bump type for sync (default: minor)
@@ -67,7 +64,7 @@ function run(command: string, flags: string[]) {
       });
     }
     default:
-      throw new UsageError(`synkro ${command}: not implemented yet`);
+      return status(options);
   }
 }
 

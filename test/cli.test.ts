@@ -1,13 +1,14 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 
-const cli = new URL("../src/cli.ts", import.meta.url).pathname;
-const { version } = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+const cli = fileURLToPath(import.meta.resolve("#cli"));
+const { version } = createRequire(import.meta.url)("#package.json");
 
 const run = (...args: string[]) =>
-  execFileSync(process.execPath, [cli, ...args], { encoding: "utf8" });
+  execFileSync(process.execPath, ["--conditions=development", cli, ...args], { encoding: "utf8" });
 
 test("--version prints the package version", () => {
   assert.equal(run("--version").trim(), version);

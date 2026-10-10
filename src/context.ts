@@ -1,5 +1,5 @@
-import { type Config, loadConfig } from "./config.ts";
-import { createGit, type Git } from "./git.ts";
+import { type Config, loadConfig } from "#config";
+import { createGit, type Git } from "#git";
 
 export class UsageError extends Error {}
 

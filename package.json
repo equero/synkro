@@ -24,6 +24,13 @@
   "bin": {
     "synkro": "dist/cli.js"
   },
+  "imports": {
+    "#package.json": "./package.json",
+    "#*": {
+      "development": "./src/*.ts",
+      "default": "./dist/*.js"
+    }
+  },
   "files": [
     "dist/"
   ],
@@ -32,11 +39,11 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "node src/cli.ts",
+    "dev": "node --conditions=development src/cli.ts",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "test": "node --test \"test/**/*.test.ts\"",
+    "test": "node --conditions=development --test \"test/**/*.test.ts\"",
     "prepublishOnly": "npm run lint && npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {

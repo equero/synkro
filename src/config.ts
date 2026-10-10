@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { Git } from "./git.ts";
+import type { Git } from "#git";
 
 export const BUMPS = ["major", "minor", "patch"] as const;
 export type Bump = (typeof BUMPS)[number];

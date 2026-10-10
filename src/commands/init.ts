@@ -1,7 +1,7 @@
-import { resolveMainBranch } from "../config.ts";
-import { type Options, openRepo, UsageError } from "../context.ts";
-import { GitError } from "../git.ts";
-import { readVersion } from "../version.ts";
+import { resolveMainBranch } from "#config";
+import { type Options, openRepo, UsageError } from "#context";
+import { GitError } from "#git";
+import { readVersion } from "#version";
 
 /**
  * Makes sure main and develop exist locally and on the remote. Only creates
