@@ -87,7 +87,8 @@ export function init(options: Options): void {
       git.write("push", "--quiet", "-u", remote, ...missing);
       log(`↑ pushed ${missing.join(", ")} to ${remote}`);
     }
-    for (const branch of [main, develop].filter((b) => !missing.includes(b))) {
+    // Branches just created with --track already have their upstream.
+    for (const branch of [main, develop].filter((b) => !missing.includes(b) && !created.has(b))) {
       if (!git.tryRead("rev-parse", "--abbrev-ref", `${branch}@{upstream}`)) {
         git.write("branch", "--quiet", `--set-upstream-to=${remote}/${branch}`, branch);
       }
