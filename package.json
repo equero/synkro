@@ -1,0 +1,47 @@
+{
+  "name": "synkro",
+  "version": "0.1.0",
+  "description": "Keep develop and main in sync and bump the version with semver, from any git repo.",
+  "keywords": [
+    "git",
+    "git-flow",
+    "semver",
+    "release",
+    "version",
+    "cli"
+  ],
+  "author": "Enrique Quero <equero@pm.me> (https://equero.dev)",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/equero/synkro.git"
+  },
+  "homepage": "https://github.com/equero/synkro#readme",
+  "bugs": {
+    "url": "https://github.com/equero/synkro/issues"
+  },
+  "type": "module",
+  "bin": {
+    "synkro": "dist/cli.js"
+  },
+  "files": [
+    "dist/"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "node src/cli.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
+    "@types/node": "^22.20.5",
+    "typescript": "^7.0.2"
+  }
+}
