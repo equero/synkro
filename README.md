@@ -13,7 +13,7 @@ npm i -g synkro
 ## Usage
 
 ```sh
-synkro init                 # create main/develop if missing and push them
+synkro init                 # create main/develop if missing and push them (works right after git init)
 synkro sync                 # merge develop into main, bump minor, tag, push
 synkro sync --patch         # same, patch bump (--major for major)
 synkro sync --dry-run       # show what would happen, change nothing
@@ -44,7 +44,8 @@ Add a `synkro` key to `package.json`, or a `.synkrorc.json` file:
 ```
 
 Without config, synkro uses `main` or `master`, whichever exists.
-Projects without a `package.json` take their version from the latest git tag.
+Projects without a `package.json` take their version from the latest `vX.Y.Z` git tag.
+No version yet? It counts as `0.0.0`, so the first `synkro sync` releases `0.1.0`.
 
 ## Development
 
