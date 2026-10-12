@@ -140,15 +140,25 @@ export function sync(options: SyncOptions): void {
     log(`- no remote "${remote}": nothing pushed`);
     return;
   }
+  // One push per ref, main first. Pushing both branches in a single push makes
+  // hosts like Vercel start two deployments of the same commit at the same
+  // instant, and one of them fails.
   const refs = [main, develop, ...(tag ? [tag] : [])];
-  try {
-    git.write("push", "--quiet", "--atomic", remote, ...refs);
-  } catch (error) {
-    if (!(error instanceof GitError)) throw error;
-    throw new UsageError(
-      `The release is done locally, but the push failed:\n${error.stderr}\n` +
-        `Retry with: git push --atomic ${remote} ${refs.join(" ")}`,
-    );
+  for (const [i, ref] of refs.entries()) {
+    try {
+      git.write("push", "--quiet", remote, ref);
+    } catch (error) {
+      if (!(error instanceof GitError)) throw error;
+      const pushed = refs.slice(0, i);
+      throw new UsageError(
+        `The release is done locally, but pushing ${ref} failed:\n${error.stderr}\n` +
+          (pushed.length ? `Already pushed: ${pushed.join(", ")}.\n` : "") +
+          `Finish with: ${refs
+            .slice(i)
+            .map((r) => `git push ${remote} ${r}`)
+            .join(" && ")}`,
+      );
+    }
   }
   log(`↑ pushed ${refs.join(", ")} to ${remote}`);
 }
