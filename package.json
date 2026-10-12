@@ -1,6 +1,6 @@
 {
   "name": "@equerodev/synkro",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Keep develop and main in sync and bump the version with semver, from any git repo.",
   "keywords": [
     "git",
